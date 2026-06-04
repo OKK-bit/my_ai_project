@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 文本处理工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            padding: 40px;
+        }
+        .container {
+            width: 600px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+        select, button {
+            padding: 10px 15px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        button {
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #357ABD;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            min-height: 80px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>AI 文本处理工具</h2>
+
+    <textarea id="inputText" rows="6" placeholder="请输入文本"></textarea>
+
+    <select id="task">
+        <option value="summary">摘要（Qwen）</option>
+        <option value="reason">推理（DeepSeek）</option>
+        <option value="translate">翻译</option>
+        <option value="explain">解释</option>
+    </select>
+
+    <button onclick="runTask()">运行任务</button>
+
+    <h3>结果：</h3>
+    <div id="result"></div>
+</div>
+
+<script>
+function runTask() {
+    const text = document.getElementById("inputText").value;
+    const task = document.getElementById("task").value;
+    const resultDiv = document.getElementById("result");
+    const button = document.querySelector("button");
+
+    // 显示加载提示
+    resultDiv.innerText = "⏳ 正在处理，请稍候…";
+    button.disabled = true;
+    button.innerText = "处理中…";
+
+    fetch("http://127.0.0.1:8080/task", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({text: text, task: task})
+    })
+    .then(res => res.json())
+    .then(data => {
+        resultDiv.innerText = data.result;
+    })
+    .catch(err => {
+        resultDiv.innerText = "❌ 出错了，请稍后再试";
+    })
+    .finally(() => {
+        button.disabled = false;
+        button.innerText = "运行任务";
+    });
+}
+
+</script>
+
+</body>
+</html>
